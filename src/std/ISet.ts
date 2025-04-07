@@ -1,4 +1,4 @@
-function eq(a: any, b: any): boolean {
+export function eq(a: any, b: any): boolean {
   if (typeof a !== typeof b) return false
   switch (typeof a) {
     case 'bigint':

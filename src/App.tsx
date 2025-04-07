@@ -13,7 +13,7 @@ function idxToPoint(i: number): Point {
 function fillPoints(
   lastSelectedPoint: Point,
   point: Point,
-  selectedCells: ISet<Point>,
+  selectedCells: Point[],
 ) {
   // generate points between the points
   let currentPoint = lastSelectedPoint
@@ -42,51 +42,56 @@ function fillPoints(
       throw 'wtf'
   }
 
-  return selectedCells.add(...points, point)
+  return [...selectedCells, ...points, point]
 }
 
 function Board({ keys }: { keys: ISet<LowercaseKey> }) {
-  let [selectedCells, setSelectedCells] = useState<ISet<Point>>(new ISet())
-  let [, setLastSelectedCell] = useState<Point | null>(null)
+  let [selectedCells, setSelectedCells] = useState<Point[]>([])
+
   return (
     <div className="grid" style={{ '--size': GRID_SIZE }} draggable="false">
       {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => (
         <div
           draggable="false"
-          onMouseDown={() => {
-            let point = idxToPoint(i)
-            setSelectedCells(new ISet([point]))
-            setLastSelectedCell(point)
-          }}
+          onMouseDown={() => setSelectedCells([idxToPoint(i)])}
           onMouseEnter={() => {
-            setLastSelectedCell((lastSelectedCell) => {
-              if (!lastSelectedCell) return lastSelectedCell
-              // if (keys.has('shift')) {
-              // }
-
+            setSelectedCells((selectedCells) => {
+              let lastSelectedCell = selectedCells.at(-1)
+              if (!lastSelectedCell) return selectedCells
               let point = idxToPoint(i)
               // make sure there's an adjacent cell that's selected
               let xDist = Math.abs(lastSelectedCell.x - point.x)
               let yDist = Math.abs(lastSelectedCell.y - point.y)
 
+              if (keys.has('shift')) {
+                if (xDist > 0 && yDist > 0) {
+                  return selectedCells
+                } else if (selectedCells.length > 2) {
+                  let [first, second] = selectedCells
+                  if (first.x === second.x) {
+                    // vertical
+                    if (xDist !== 0) return selectedCells
+                  } else {
+                    // horizontal
+                    if (yDist !== 0) return selectedCells
+                  }
+                }
+              }
+
               if (xDist <= 1 && yDist <= 1) {
-                setSelectedCells((cells) => cells.add(point))
-                setLastSelectedCell(point)
+                return selectedCells
+                // return [...selectedCells, point]
               } else {
                 // we need to fill in the points from the nearest point
-                setSelectedCells((cells) =>
-                  fillPoints(lastSelectedCell, point, cells),
-                )
+                return fillPoints(lastSelectedCell, point, selectedCells)
               }
-              return lastSelectedCell
             })
           }}
-          onMouseUp={() => {
-            setSelectedCells(new ISet())
-            setLastSelectedCell(null)
-          }}
+          onMouseUp={() => setSelectedCells([])}
           className="cell"
-          data-selected={selectedCells.has(idxToPoint(i))}
+          data-selected={selectedCells.some(
+            ({ x, y }) => x === idxToPoint(i).x && y === idxToPoint(i).y,
+          )}
           key={`cell-${i}`}
           style={{ '--pos': i }}
         >
