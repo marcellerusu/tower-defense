@@ -45,59 +45,81 @@ function fillPoints(
   return [...selectedCells, ...points, point]
 }
 
+type CellProps = {
+  x: number
+  y: number
+  keys: ISet<LowercaseKey>
+  setSelectedCells: (update: ((point: Point[]) => Point[]) | Point[]) => void
+  isSelected: boolean
+}
+
+function Cell({ x, y, keys, setSelectedCells, isSelected }: CellProps) {
+  return (
+    <div
+      draggable="false"
+      onMouseDown={() => setSelectedCells([{ x, y }])}
+      onMouseEnter={() => {
+        setSelectedCells((selectedCells) => {
+          let lastSelectedCell = selectedCells.at(-1)
+          if (!lastSelectedCell) return selectedCells
+          // make sure there's an adjacent cell that's selected
+          let xDist = Math.abs(lastSelectedCell.x - x)
+          let yDist = Math.abs(lastSelectedCell.y - y)
+
+          if (keys.has('shift')) {
+            if (xDist > 0 && yDist > 0) {
+              return selectedCells
+            } else if (selectedCells.length > 2) {
+              let [first, second] = selectedCells
+              if (first.x === second.x) {
+                // vertical
+                if (xDist !== 0) return selectedCells
+              } else {
+                // horizontal
+                if (yDist !== 0) return selectedCells
+              }
+            }
+          }
+
+          if (xDist <= 1 && yDist <= 1) {
+            return [...selectedCells, { x, y }]
+          } else {
+            // we need to fill in the points from the nearest point
+            return fillPoints(lastSelectedCell, { x, y }, selectedCells)
+          }
+        })
+      }}
+      onMouseUp={() => setSelectedCells([])}
+      className="cell"
+      data-selected={isSelected}
+      key={`cell-${x}-${y}`}
+      style={{ '--pos': x * y }}
+    >
+      <div className="inner" />
+    </div>
+  )
+}
+
 function Board({ keys }: { keys: ISet<LowercaseKey> }) {
   let [selectedCells, setSelectedCells] = useState<Point[]>([])
 
   return (
     <div className="grid" style={{ '--size': GRID_SIZE }} draggable="false">
-      {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => (
-        <div
-          draggable="false"
-          onMouseDown={() => setSelectedCells([idxToPoint(i)])}
-          onMouseEnter={() => {
-            setSelectedCells((selectedCells) => {
-              let lastSelectedCell = selectedCells.at(-1)
-              if (!lastSelectedCell) return selectedCells
-              let point = idxToPoint(i)
-              // make sure there's an adjacent cell that's selected
-              let xDist = Math.abs(lastSelectedCell.x - point.x)
-              let yDist = Math.abs(lastSelectedCell.y - point.y)
-
-              if (keys.has('shift')) {
-                if (xDist > 0 && yDist > 0) {
-                  return selectedCells
-                } else if (selectedCells.length > 2) {
-                  let [first, second] = selectedCells
-                  if (first.x === second.x) {
-                    // vertical
-                    if (xDist !== 0) return selectedCells
-                  } else {
-                    // horizontal
-                    if (yDist !== 0) return selectedCells
-                  }
-                }
-              }
-
-              if (xDist <= 1 && yDist <= 1) {
-                return selectedCells
-                // return [...selectedCells, point]
-              } else {
-                // we need to fill in the points from the nearest point
-                return fillPoints(lastSelectedCell, point, selectedCells)
-              }
-            })
-          }}
-          onMouseUp={() => setSelectedCells([])}
-          className="cell"
-          data-selected={selectedCells.some(
-            ({ x, y }) => x === idxToPoint(i).x && y === idxToPoint(i).y,
-          )}
-          key={`cell-${i}`}
-          style={{ '--pos': i }}
-        >
-          <div className="inner" />
-        </div>
-      ))}
+      {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => {
+        let point = idxToPoint(i)
+        return (
+          <Cell
+            key={i}
+            keys={keys}
+            x={point.x}
+            y={point.y}
+            isSelected={selectedCells.some(
+              ({ x, y }) => x === point.x && y === point.y,
+            )}
+            setSelectedCells={setSelectedCells}
+          />
+        )
+      })}
     </div>
   )
 }
