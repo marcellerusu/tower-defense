@@ -33,8 +33,8 @@ class ISet<T extends { toString(): string }> {
   [Symbol.iterator]() {
     return this.#set[Symbol.iterator]()
   }
-  add(value: T) {
-    return new ISet([...this, value])
+  add(...values: T[]) {
+    return new ISet([...this, ...values])
   }
   delete(value: T) {
     let self = new Set(this.#set)
@@ -49,6 +49,9 @@ class ISet<T extends { toString(): string }> {
   }
   join(separator?: string) {
     return this.#set.join(separator)
+  }
+  some(predicate: (value: T) => boolean) {
+    return this.#set.some(predicate)
   }
 }
 
