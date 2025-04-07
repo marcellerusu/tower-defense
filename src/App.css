@@ -15,6 +15,7 @@
 .grid {
   --cell-size: 40px;
   display: grid;
+  user-select: none;
   grid-template-rows: repeat(var(--size), var(--cell-size));
   grid-template-columns: repeat(var(--size), var(--cell-size));
   gap: 2px;
@@ -33,7 +34,7 @@
   }
 }
 
-[data-key-pressed~='shift'] :is(.cell:hover, .cell[data-selected='true']) {
+:is(.cell:hover, .cell[data-selected='true']) {
   .inner {
     box-shadow: 0 0 0 2px rgb(195, 195, 195);
   }

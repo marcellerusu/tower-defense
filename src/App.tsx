@@ -4,14 +4,16 @@ import './App.css'
 
 let GRID_SIZE = 10
 
-function Board() {
+function Board({ keys }: { keys: ISet<string> }) {
   let [selectedCells, setSelectedCells] = useState<ISet<number>>(new ISet())
   return (
     <div className="grid" style={{ '--size': GRID_SIZE }} draggable="false">
       {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => (
         <div
           draggable="false"
-          onMouseDown={() => setSelectedCells(new ISet([i]))}
+          onMouseDown={() => {
+            if (keys.has('shift')) setSelectedCells(new ISet([i]))
+          }}
           onMouseEnter={() => {
             if (selectedCells.size === 0) return
             setSelectedCells((cells) => cells.add(i))
@@ -49,7 +51,7 @@ function App() {
 
   return (
     <main data-key-pressed={keys.join(' ')}>
-      <Board />
+      <Board keys={keys} />
     </main>
   )
 }
