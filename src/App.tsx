@@ -20,7 +20,9 @@ function App() {
           data-selected={selectedCells.has(i)}
           key={`cell-${i}`}
           style={{ '--pos': i }}
-        ></div>
+        >
+          <div className="inner" />
+        </div>
       ))}
     </div>
   )

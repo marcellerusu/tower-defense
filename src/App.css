@@ -17,18 +17,27 @@
   display: grid;
   grid-template-rows: repeat(var(--size), var(--cell-size));
   grid-template-columns: repeat(var(--size), var(--cell-size));
+  gap: 2px;
+  border: 1px solid white;
 }
 
 .cell {
   background-color: rgb(calc(var(--pos) * 2), 49, calc(var(--pos) * 2));
-  border: 0.1em solid black;
+  margin: 0;
+  padding: 0;
   animation: cycle-background linear infinite 10s;
-  transition: border-color 100ms;
+  .inner {
+    height: 100%;
+    box-shadow: 0 0 0px black;
+    transition: box-shadow 150ms;
+  }
   &:hover,
   &[data-selected='true'] {
-    border-color: white;
+    .inner {
+      box-shadow: 0 0 0 2px rgb(195, 195, 195);
+    }
     cursor: pointer;
-    filter: contrast(0.9);
+    filter: contrast(0.8);
   }
 }
 
