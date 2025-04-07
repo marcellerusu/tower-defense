@@ -20,6 +20,7 @@
   grid-template-columns: repeat(var(--size), var(--cell-size));
   gap: 2px;
   border: 1px solid white;
+  overflow: hidden;
 }
 
 .cell {
