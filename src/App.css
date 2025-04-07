@@ -1,0 +1,49 @@
+:root {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+@property --pos {
+  syntax: '<number>'; /* or '<color>', '<number>', etc. */
+  inherits: true;
+  initial-value: 0;
+}
+
+.grid {
+  --cell-size: 40px;
+  display: grid;
+  grid-template-rows: repeat(var(--size), var(--cell-size));
+  grid-template-columns: repeat(var(--size), var(--cell-size));
+}
+
+.cell {
+  background-color: rgb(calc(var(--pos) * 2), 49, calc(var(--pos) * 2));
+  border: 0.1em solid black;
+  animation: cycle-background linear infinite 10s;
+  transition: border-color 100ms;
+  &:hover,
+  &[data-selected='true'] {
+    border-color: white;
+    cursor: pointer;
+    filter: contrast(0.9);
+  }
+}
+
+@keyframes cycle-background {
+  0% {
+    background-color: rgb(calc(var(--pos) * 2), 49, calc(var(--pos) * 2));
+  }
+  50% {
+    background-color: rgb(
+      calc(var(--pos) * 0.5),
+      calc(var(--pos) * 1),
+      calc(var(--pos) * 0.1)
+    );
+  }
+  100% {
+    background-color: rgb(calc(var(--pos) * 2), 49, calc(var(--pos) * 2));
+  }
+}
