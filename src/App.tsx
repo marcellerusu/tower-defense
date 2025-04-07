@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import ISet from './std/ISet'
+import ISet from '@/std/ISet'
 import './App.css'
 
 let GRID_SIZE = 10
