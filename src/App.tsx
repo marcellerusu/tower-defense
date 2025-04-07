@@ -1,21 +1,22 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import ISet from './std/ISet'
 import './App.css'
 
 let GRID_SIZE = 10
 
-function App() {
-  let [selectedCells, setSelectedCells] = useState<Set<number>>(new Set())
+function Board() {
+  let [selectedCells, setSelectedCells] = useState<ISet<number>>(new ISet())
   return (
     <div className="grid" style={{ '--size': GRID_SIZE }} draggable="false">
       {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => (
         <div
           draggable="false"
-          onMouseDown={() => setSelectedCells(new Set([i]))}
+          onMouseDown={() => setSelectedCells(new ISet([i]))}
           onMouseEnter={() => {
             if (selectedCells.size === 0) return
-            setSelectedCells((cells) => new Set([...cells, i]))
+            setSelectedCells((cells) => cells.add(i))
           }}
-          onMouseUp={() => setSelectedCells(new Set())}
+          onMouseUp={() => setSelectedCells(new ISet())}
           className="cell"
           data-selected={selectedCells.has(i)}
           key={`cell-${i}`}
@@ -25,6 +26,31 @@ function App() {
         </div>
       ))}
     </div>
+  )
+}
+
+function App() {
+  let [keys, setKeys] = useState<ISet<string>>(new ISet())
+
+  useEffect(() => {
+    function keydown(e: KeyboardEvent) {
+      setKeys((keys) => keys.add(e.key.toLowerCase()))
+    }
+    function keyup(e: KeyboardEvent) {
+      setKeys((keys) => keys.delete(e.key.toLowerCase()))
+    }
+    window.addEventListener('keydown', keydown)
+    window.addEventListener('keyup', keyup)
+    return () => {
+      window.removeEventListener('keydown', keydown)
+      window.removeEventListener('keyup', keyup)
+    }
+  }, [])
+
+  return (
+    <main data-key-pressed={keys.join(' ')}>
+      <Board />
+    </main>
   )
 }
 

@@ -31,14 +31,14 @@
     box-shadow: 0 0 0px black;
     transition: box-shadow 150ms;
   }
-  &:hover,
-  &[data-selected='true'] {
-    .inner {
-      box-shadow: 0 0 0 2px rgb(195, 195, 195);
-    }
-    cursor: pointer;
-    filter: contrast(0.8);
+}
+
+[data-key-pressed~='shift'] :is(.cell:hover, .cell[data-selected='true']) {
+  .inner {
+    box-shadow: 0 0 0 2px rgb(195, 195, 195);
   }
+  cursor: pointer;
+  filter: contrast(0.8);
 }
 
 @keyframes cycle-background {
