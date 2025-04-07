@@ -50,8 +50,8 @@ class ISet<T extends { toString(): string }> {
   join(separator?: string) {
     return this.#set.join(separator)
   }
-  some(predicate: (value: T) => boolean) {
-    return this.#set.some(predicate)
+  find(predicate: (value: T) => boolean): T | undefined {
+    return this.#set.find(predicate)
   }
 }
 
