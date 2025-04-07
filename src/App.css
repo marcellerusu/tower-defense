@@ -35,7 +35,8 @@
   }
 }
 
-:is(.cell:hover, .cell[data-selected='true']) {
+.cell:hover,
+.cell[data-selected='true'] {
   .inner {
     box-shadow: 0 0 0 2px rgb(195, 195, 195);
   }

@@ -1,7 +1,34 @@
+function eq(a: any, b: any): boolean {
+  if (typeof a !== typeof b) return false
+  switch (typeof a) {
+    case 'bigint':
+    case 'boolean':
+    case 'number':
+    case 'string':
+    case 'function':
+    case 'undefined':
+      return a === b
+    case 'object':
+      switch (a.constructor) {
+        case Array:
+          if (a.length !== b.length) return false
+          return (a as Array<any>).every((x: any, i) => eq(x, b[i]))
+        case Object:
+          if (Object.keys(a).length !== Object.keys(b).length) return false
+          for (let key in a) if (!eq(a[key], b[key])) return false
+          return true
+        default:
+          throw 'unknown'
+      }
+    case 'symbol':
+      throw 'unknown'
+  }
+}
+
 class ISet<T extends { toString(): string }> {
-  #set: Set<T>
+  #set: T[]
   constructor(iterable: Iterable<T> = []) {
-    this.#set = new Set(iterable)
+    this.#set = Array.from(iterable)
   }
   [Symbol.iterator]() {
     return this.#set[Symbol.iterator]()
@@ -15,18 +42,13 @@ class ISet<T extends { toString(): string }> {
     return new ISet(self)
   }
   has(value: T) {
-    return this.#set.has(value)
+    return this.#set.some((item) => eq(item, value))
   }
   get size() {
-    return this.#set.size
+    return this.#set.length
   }
-  join(separator: string) {
-    let out = ''
-    for (let elem of this) {
-      out += elem.toString() + separator
-    }
-    out.slice(0, out.length - separator.length)
-    return out
+  join(separator?: string) {
+    return this.#set.join(separator)
   }
 }
 

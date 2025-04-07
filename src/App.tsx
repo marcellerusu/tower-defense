@@ -2,25 +2,30 @@ import { useEffect, useState } from 'react'
 import ISet from '@/std/ISet'
 import './App.css'
 
-let GRID_SIZE = 10
+type Point = { x: number; y: number }
 
-function Board({ keys }: { keys: ISet<string> }) {
-  let [selectedCells, setSelectedCells] = useState<ISet<number>>(new ISet())
+let GRID_SIZE = 10
+function idxToPoint(i: number): Point {
+  return { x: i % GRID_SIZE, y: Math.floor(i / GRID_SIZE) }
+}
+
+function Board() {
+  let [selectedCells, setSelectedCells] = useState<ISet<Point>>(new ISet())
   return (
     <div className="grid" style={{ '--size': GRID_SIZE }} draggable="false">
       {Array.from({ length: GRID_SIZE * GRID_SIZE }, (_, i) => (
         <div
           draggable="false"
-          onMouseDown={() => {
-            if (keys.has('shift')) setSelectedCells(new ISet([i]))
-          }}
+          onMouseDown={() => setSelectedCells(new ISet([idxToPoint(i)]))}
           onMouseEnter={() => {
             if (selectedCells.size === 0) return
-            setSelectedCells((cells) => cells.add(i))
+            // detect if there's any cells between us
+
+            setSelectedCells((cells) => cells.add(idxToPoint(i)))
           }}
           onMouseUp={() => setSelectedCells(new ISet())}
           className="cell"
-          data-selected={selectedCells.has(i)}
+          data-selected={selectedCells.has(idxToPoint(i))}
           key={`cell-${i}`}
           style={{ '--pos': i }}
         >
@@ -51,7 +56,7 @@ function App() {
 
   return (
     <main data-key-pressed={keys.join(' ')}>
-      <Board keys={keys} />
+      <Board />
     </main>
   )
 }
